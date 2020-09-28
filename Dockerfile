@@ -12,4 +12,4 @@ RUN git clone --depth 1 --branch DepotDownloader_2.3.6 https://github.com/SteamR
   && rm -rf build \
   && mkdir /steam
 
-COPY download /opt/bin/download
+COPY scripts/download /opt/bin/download
