@@ -6,7 +6,7 @@ Please visit https://github.com/SteamRE/DepotDownloader for more information.
 ## Manual usage
 
 ```
-docker run -it -v <DESTINATION_DIR>:/steam -v <DEPOT_DOWNLOADER_SHARE>:/root/.local/share depotdownloader:<tag> download -app <app_id>
+docker run -it --rm -v <DESTINATION_DIR>:/steam -v <DEPOT_DOWNLOADER_SHARE>:/root/.local/share --name DepotDownloader depotdownloader:<tag> download -app <app_id>
 ```
 
 - `-it` is necessary to activate docker's interactive mode, as the DepotDownloader expects you to type in username, password and two-factor authentication tokens (if enabled). If you forget this argument, you might get an authentication loop, which will result in an excess of Steams rate limit. In that case, you might have to wait 30 minutes, before Steam allows a Login from your network.
@@ -35,3 +35,13 @@ targetdir="/steam/$1"
 [ ! -d $destdir ] && mkdir -p $destdir
 sudo docker run -it --rm --name DepotDownloader -v ${destdir}:/steam -v DepotDownloaderShare:/root/.local/share depotdownloader:${appversion} download -app $1 -username ${username} -password ${password} -dir ${targetdir} -os ${os} -remember-password
 ```
+
+## Run in background
+
+While connected to the running DepotDownloader container, press `ctrl+p` followed by `ctrl+q` to detach from the running container and let it run in background.
+
+To see its output, type 
+```sudo docker logs DepotDownloader```
+
+To reconnect type 
+```sudo docker attach DepotDownloader```
