@@ -1,0 +1,24 @@
+FROM alpine AS qemu
+
+#QEMU Download
+ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-aarch64.tar.gz
+RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
+
+
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster-arm64v8
+
+COPY --from=qemu qemu-aarch64-static /usr/bin
+
+WORKDIR /opt
+
+ENV PATH="/opt/bin:${PATH}"
+
+# Download and compile DepotDownloader
+RUN git clone --depth 1 --branch DepotDownloader_2.3.6 https://github.com/SteamRE/DepotDownloader.git build/ \
+  && dotnet build build/DepotDownloader.sln \
+  && mkdir DepotDownloader \
+  && mv build/DepotDownloader/bin/Debug/netcoreapp2.0/* ./DepotDownloader \
+  && rm -rf build \
+  && mkdir /steam
+
+COPY scripts/download /opt/bin/download
