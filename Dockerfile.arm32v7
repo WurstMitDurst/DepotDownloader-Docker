@@ -1,31 +1,28 @@
 #QEMU used inside final image to install packages
 FROM alpine AS qemu
-ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-aarch64.tar.gz
+ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz
 RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
 
 # Build image
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build
 
 RUN git clone --depth 1 --branch DepotDownloader_2.3.6 https://github.com/SteamRE/DepotDownloader.git build/ \
-  # Compiling for runtime arm64 does not work with dotnetcore2.0
-  # We need to patch the build target 
-  && sed -i 's/netcoreapp2.0/netcoreapp3.1/g' build/DepotDownloader/DepotDownloader.csproj \
-  && dotnet publish -c release -o /app -r linux-arm64 build/DepotDownloader.sln
+  && dotnet publish -c release -o /app -r linux-arm build/DepotDownloader.sln
 
 
 # Final image
 # DepotDownlaoder targets dotnetcore2.0, which requires
 # OpenSSL 1.0. This is not available in buster and newer,
 # so we are stuck to Debian stretch.
-FROM arm64v8/debian:stretch-slim
+FROM arm32v7/debian:stretch-slim
 
 ENV PATH="/opt/bin:${PATH}"
 
-COPY --from=qemu qemu-aarch64-static /usr/bin
+COPY --from=qemu qemu-arm-static /usr/bin
 
 # Install curl, when build target was dotnetcore2.0
 # Install wget, when build target was dotnetcore3.0 and higher
-RUN apt-get update && apt-get install -y wget libicu57 libssl1.0.2 libunwind8 \
+RUN apt-get update && apt-get install -y curl libicu57 libssl1.0.2 libunwind8 \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir /opt/DepotDownloader \
   && mkdir /steam
