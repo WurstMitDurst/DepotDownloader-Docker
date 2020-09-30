@@ -1,2 +1,2 @@
 #!/bin/bash
-./opt/DepotDownloader/DepotDownloader "%@"
+./opt/DepotDownloader/DepotDownloader "$@"
