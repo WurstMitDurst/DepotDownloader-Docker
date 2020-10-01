@@ -1,0 +1,16 @@
+image: wurstmitdurst/depotdownloader:latest
+manifests:
+  - image: wurstmitdurst/depotdownloader:latest-amd64
+    platform:
+      architecture: amd64
+      os: linux
+  - image: wurstmitdurst/depotdownloader:latest-arm32v7
+    platform:
+      architecture: arm32
+      variant: v7
+      os: linux
+  - image: wurstmitdurst/depotdownloader:latest-arm64v8
+    platform:
+      architecture: arm64
+      variant: v8
+      os: linux
